@@ -8,3 +8,9 @@ userdata_294.sh
 TEST_COMMANDS.txt
 
 rootkey.csv
+
+# LaTeX Auxiliary Files
+*.aux
+*.log
+*.out
+*.toc
