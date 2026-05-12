@@ -1,0 +1,12 @@
+{
+  "name": "notification-service-294",
+  "version": "1.0.0",
+  "description": "Notification & Logging Service for DataHive Inc.",
+  "main": "consumer.js",
+  "scripts": {
+    "start": "node consumer.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3"
+  }
+}

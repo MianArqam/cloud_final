@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  postgres_294:
+    image: postgres:15-alpine
+    container_name: postgres_294
+    environment:
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASS:-admin123}
+      POSTGRES_DB: ${DB_NAME:-db_294}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_294:/var/lib/postgresql/data
+      - ./postgres/init_294.sql:/docker-entrypoint-initdb.d/init_294.sql
+    networks:
+      - network_294
+
+  rabbitmq_294:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_294
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data_294:/var/lib/rabbitmq
+    networks:
+      - network_294
+
+  auth_service_294:
+    build: ./services/auth-service
+    container_name: auth_service_294
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=postgres_294
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASS=${DB_PASS:-admin123}
+      - DB_NAME=${DB_NAME:-db_294}
+      - DB_PORT=5432
+      - JWT_SECRET=${JWT_SECRET:-supersecretkey294}
+      - PORT=5001
+    depends_on:
+      - postgres_294
+    networks:
+      - network_294
+
+  event_service_294:
+    build: ./services/event-service
+    container_name: event_service_294
+    ports:
+      - "5002:5002"
+    environment:
+      - DB_HOST=postgres_294
+      - DB_USER=${DB_USER:-admin}
+      - DB_PASS=${DB_PASS:-admin123}
+      - DB_NAME=${DB_NAME:-db_294}
+      - DB_PORT=5432
+      - JWT_SECRET=${JWT_SECRET:-supersecretkey294}
+      - RABBITMQ_URL=amqp://rabbitmq_294:5672
+      - PORT=5002
+    depends_on:
+      - postgres_294
+      - rabbitmq_294
+    networks:
+      - network_294
+
+  notification_service_294:
+    build: ./services/notification-service
+    container_name: notification_service_294
+    environment:
+      - RABBITMQ_URL=amqp://rabbitmq_294:5672
+    volumes:
+      - ./logs:/logs
+    depends_on:
+      - rabbitmq_294
+    networks:
+      - network_294
+
+networks:
+  network_294:
+    driver: bridge
+
+volumes:
+  postgres_data_294:
+  rabbitmq_data_294:
