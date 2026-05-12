@@ -6,3 +6,5 @@ logs/
 sg_rules.json
 userdata_294.sh
 TEST_COMMANDS.txt
+
+rootkey.csv
